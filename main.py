@@ -1,5 +1,7 @@
 from random import choice
 
+BOARD_MAP = {str(col + 1 + 3 * row): (row, col) for row in range(3) for col in range(3)}
+
 
 def display_board(board):
     # The function accepts one parameter containing the board's current status
@@ -12,11 +14,9 @@ def display_board(board):
         print("+-------+-------+-------+")
 
 
-def validate_input(row, col):
-    if row.isdigit() and col.isdigit():
-        row = int(row)
-        col = int(col)
-        if 0 < row < 4 and 0 < col < 4:
+def validate_input(move_input):
+    if move_input.isdigit():
+        if 1 <= int(move_input) <= 9:
             return True
     return False
 
@@ -25,15 +25,10 @@ def enter_move(board):
     # The function accepts the board's current status, asks the user about their move,
     # checks the input, and updates the board according to the user's decision.
     while True:
-        row = input("Enter the row number (1-3): ")
-        col = input("Enter the column number (1-3): ")
-
-        if validate_input(row, col):
-            free_fields = make_list_of_free_fields(board)
-            row = int(row) - 1  # convert to 0-based index
-            col = int(col) - 1  # convert to 0-based index
-
-            if (row, col) in free_fields:  # check if the field is free
+        move_input = input("Enter your move: ")
+        if validate_input(move_input):
+            row, col = BOARD_MAP[move_input]
+            if board[row][col] not in ["O", "X"]:  # check if the field is free
                 board[row][col] = "O"
                 break
             else:
@@ -71,7 +66,7 @@ def draw_move(board, move_count):
 
 
 def build_board():
-    return [[str(i + 1 + 3 * j) for i in range(3)] for j in range(3)]
+    return [[str(row + 1 + 3 * col) for row in range(3)] for col in range(3)]
 
 
 def main():
@@ -85,14 +80,17 @@ def main():
 
     while True:
         # Computer's move
+        print("Computer's move:")
         board = draw_move(board, move_count)
         display_board(board)
         move_count += 1
+
         # TODO: check if the computer has won
         if victory_for(board, "X"):
             pass
 
         # User's move
+        print("Your move:")
         board = enter_move(board)
         display_board(board)
         move_count += 1
@@ -104,3 +102,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # pass
