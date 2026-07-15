@@ -4,14 +4,13 @@ BOARD_MAP = {str(col + 1 + 3 * row): (row, col) for row in range(3) for col in r
 
 
 def display_board(board):
-    # The function accepts one parameter containing the board's current status
-    # and prints it out to the console.
     print("+-------+-------+-------+")
     for row in board:
         print("|       |       |       |")
         print("|   " + row[0] + "   |   " + row[1] + "   |   " + row[2] + "   |")
         print("|       |       |       |")
         print("+-------+-------+-------+")
+    print("\n\n")
 
 
 def validate_input(move_input):
@@ -22,10 +21,8 @@ def validate_input(move_input):
 
 
 def enter_move(board):
-    # The function accepts the board's current status, asks the user about their move,
-    # checks the input, and updates the board according to the user's decision.
     while True:
-        move_input = input("Enter your move: ")
+        move_input = input("Enter your move (1-9): ")
         if validate_input(move_input):
             row, col = BOARD_MAP[move_input]
             if board[row][col] not in ["O", "X"]:  # check if the field is free
@@ -40,8 +37,6 @@ def enter_move(board):
 
 
 def make_list_of_free_fields(board):
-    # The function browses the board and builds a list of all the free squares;
-    # the list consists of tuples, while each tuple is a pair of row and column numbers.
     free_fields = [
         (i, j) for i in range(3) for j in range(3) if board[i][j] not in ["O", "X"]
     ]
@@ -49,9 +44,28 @@ def make_list_of_free_fields(board):
 
 
 def victory_for(board, sign):
-    # The function analyzes the board's status in order to check if
-    # the player using 'O's or 'X's has won the game
-    pass
+    n = len(board)
+
+    # check rows
+    for i in range(n):
+        if all(board[i][j] == sign for j in range(n)):
+            return True
+
+    # check columns
+    for j in range(n):
+        if all(board[i][j] == sign for i in range(n)):
+            return True
+
+    # check primary diagonal
+    if all(board[i][i] == sign for i in range(n)):
+        return True
+
+    # check secondary diagonal
+    # in a n x n matrix, indexes follow the pattern row + col = n - 1
+    if all(board[i][n - 1 - i] == sign for i in range(n)):
+        return True
+
+    return False
 
 
 def draw_move(board, move_count):
@@ -70,36 +84,43 @@ def build_board():
 
 
 def main():
-    move_count = 1
+    computer_won = False
+    user_won = False
+    move_count = 0
     board = build_board()
-    print("Welcome to the Tic-Tac-Toe game!")
-    print("Move count: ", move_count)
-    display_board(board)
-
-    # TODO: game loop
+    print("Welcome to the Tic-Tac-Toe game!\n\n")
 
     while True:
         # Computer's move
         print("Computer's move:")
+        move_count += 1
         board = draw_move(board, move_count)
         display_board(board)
-        move_count += 1
 
-        # TODO: check if the computer has won
         if victory_for(board, "X"):
-            pass
+            computer_won = True
+            break
+
+        if move_count == 9:
+            break
 
         # User's move
         print("Your move:")
+        move_count += 1
         board = enter_move(board)
         display_board(board)
-        move_count += 1
 
-        # TODO: check if the user has won
         if victory_for(board, "O"):
-            pass
+            user_won = True
+            break
+
+    if computer_won:
+        print("Computer won!")
+    elif user_won:
+        print("User won!")
+    else:
+        print("It's a draw!")
 
 
 if __name__ == "__main__":
     main()
-    # pass
